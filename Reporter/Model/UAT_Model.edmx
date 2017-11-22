@@ -1,0 +1,460 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="alis_uatModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="g_batch_audit">
+          <Key>
+            <PropertyRef Name="pk" />
+          </Key>
+          <Property Name="pk" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="entry_type" Type="smallint" Nullable="false" />
+          <Property Name="entry_time" Type="datetime" Nullable="false" />
+          <Property Name="primary_key_type" Type="smallint" />
+          <Property Name="primary_key" Type="varchar" MaxLength="20" />
+          <Property Name="secondary_key_type" Type="smallint" />
+          <Property Name="secondary_key" Type="varchar" MaxLength="20" />
+          <Property Name="third_key_type" Type="smallint" />
+          <Property Name="third_key" Type="varchar" MaxLength="20" />
+          <Property Name="reference" Type="int" />
+          <Property Name="batch_run_num" Type="int" />
+          <Property Name="batch_id" Type="int" />
+          <Property Name="task_id" Type="int" />
+          <Property Name="error_no" Type="int" />
+          <Property Name="description" Type="varchar" MaxLength="2000" />
+          <Property Name="assigned_team_no" Type="int" />
+          <Property Name="assigned_user_id" Type="int" />
+          <Property Name="chunk_id" Type="int" />
+          <Property Name="server_name" Type="varchar" MaxLength="256" />
+          <Property Name="pid" Type="int" />
+          <Property Name="discriminator" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'auth_uat.dbo.sys_auth_data' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="sys_auth_data">
+          <Key>
+            <PropertyRef Name="db_name" />
+            <PropertyRef Name="log_id" />
+            <PropertyRef Name="default_data" />
+            <PropertyRef Name="company_id" />
+            <PropertyRef Name="show_flag" />
+            <PropertyRef Name="uniqid" />
+            <PropertyRef Name="discriminator" />
+          </Key>
+          <Property Name="dbms" Type="varchar" MaxLength="50" />
+          <Property Name="db_name" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="log_id" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="log_pw" Type="varchar" MaxLength="100" />
+          <Property Name="server_name" Type="varchar" MaxLength="30" />
+          <Property Name="dbparm" Type="varchar" MaxLength="100" />
+          <Property Name="default_data" Type="smallint" Nullable="false" />
+          <Property Name="company_id" Type="int" Nullable="false" />
+          <Property Name="company_name" Type="varchar" MaxLength="50" />
+          <Property Name="sec_db_name" Type="varchar" MaxLength="30" />
+          <Property Name="web_company_id" Type="varchar" MaxLength="10" />
+          <Property Name="external_authentication_code" Type="smallint" />
+          <Property Name="show_flag" Type="smallint" Nullable="false" />
+          <Property Name="linked_server" Type="varchar" MaxLength="25" />
+          <Property Name="j2ee_datasource" Type="varchar" MaxLength="80" />
+          <Property Name="jdbc_connect_string" Type="varchar" MaxLength="80" />
+          <Property Name="driver" Type="varchar" MaxLength="255" />
+          <Property Name="port_number" Type="varchar" MaxLength="10" />
+          <Property Name="schema_name" Type="varchar" MaxLength="30" />
+          <Property Name="rdbms" Type="varchar" MaxLength="30" />
+          <Property Name="uniqid" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="driver_params" Type="varchar" MaxLength="255" />
+          <Property Name="discriminator" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'auth_uat.dbo.t_batch' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="t_batch">
+          <Key>
+            
+            
+            
+            
+            
+            <PropertyRef Name="uniqid" />
+            
+          </Key>
+          <Property Name="batch_id" Type="int" Nullable="false" />
+          <Property Name="batch_name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="status" Type="smallint" Nullable="false" />
+          <Property Name="output_frequency" Type="smallint" />
+          <Property Name="commit_flag" Type="smallint" Nullable="false" />
+          <Property Name="details_group" Type="smallint" />
+          <Property Name="max_db_errors" Type="smallint" />
+          <Property Name="ol_activation_code" Type="smallint" />
+          <Property Name="auto_activation_code" Type="smallint" />
+          <Property Name="entity_key" Type="int" Nullable="false" />
+          <Property Name="uniqid" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="discriminator" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'auth_uat.dbo.t_task' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="t_task">
+          <Key>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            <PropertyRef Name="uniqid" />
+            
+            
+          </Key>
+          <Property Name="task_id" Type="int" Nullable="false" />
+          <Property Name="task_name" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="opening_reg_date" Type="datetime" Nullable="false" />
+          <Property Name="opening_user_id" Type="int" Nullable="false" />
+          <Property Name="interface_type" Type="smallint" Nullable="false" />
+          <Property Name="entry_point_name" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="task_run_name" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="commit_frequency" Type="smallint" Nullable="false" />
+          <Property Name="comment_text" Type="varchar" MaxLength="255" />
+          <Property Name="entity_key" Type="int" Nullable="false" />
+          <Property Name="post_task" Type="int" />
+          <Property Name="pre_task" Type="int" />
+          <Property Name="chunk_param" Type="int" />
+          <Property Name="chunk_flag" Type="int" />
+          <Property Name="chunk_type" Type="int" />
+          <Property Name="failure_action" Type="int" Nullable="false" />
+          <Property Name="timeout_seconds" Type="int" Nullable="false" />
+          <Property Name="num_retries" Type="int" Nullable="false" />
+          <Property Name="counter_inc" Type="int" Nullable="false" />
+          <Property Name="max_items_before_memory_claen" Type="smallint" />
+          <Property Name="uniqid" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="discriminator" Type="int" Nullable="false" />
+          <Property Name="activity_code" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="alis_uatModelStoreContainer">
+          <EntitySet Name="g_batch_audit" EntityType="Self.g_batch_audit" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sys_auth_data" EntityType="Self.sys_auth_data" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [sys_auth_data].[dbms] AS [dbms], 
+    [sys_auth_data].[db_name] AS [db_name], 
+    [sys_auth_data].[log_id] AS [log_id], 
+    [sys_auth_data].[log_pw] AS [log_pw], 
+    [sys_auth_data].[server_name] AS [server_name], 
+    [sys_auth_data].[dbparm] AS [dbparm], 
+    [sys_auth_data].[default_data] AS [default_data], 
+    [sys_auth_data].[company_id] AS [company_id], 
+    [sys_auth_data].[company_name] AS [company_name], 
+    [sys_auth_data].[sec_db_name] AS [sec_db_name], 
+    [sys_auth_data].[web_company_id] AS [web_company_id], 
+    [sys_auth_data].[external_authentication_code] AS [external_authentication_code], 
+    [sys_auth_data].[show_flag] AS [show_flag], 
+    [sys_auth_data].[linked_server] AS [linked_server], 
+    [sys_auth_data].[j2ee_datasource] AS [j2ee_datasource], 
+    [sys_auth_data].[jdbc_connect_string] AS [jdbc_connect_string], 
+    [sys_auth_data].[driver] AS [driver], 
+    [sys_auth_data].[port_number] AS [port_number], 
+    [sys_auth_data].[schema_name] AS [schema_name], 
+    [sys_auth_data].[rdbms] AS [rdbms], 
+    [sys_auth_data].[uniqid] AS [uniqid], 
+    [sys_auth_data].[driver_params] AS [driver_params], 
+    [sys_auth_data].[discriminator] AS [discriminator]
+    FROM [dbo].[sys_auth_data] AS [sys_auth_data]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="t_batch" EntityType="Self.t_batch" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [t_batch].[batch_id] AS [batch_id], 
+    [t_batch].[batch_name] AS [batch_name], 
+    [t_batch].[status] AS [status], 
+    [t_batch].[output_frequency] AS [output_frequency], 
+    [t_batch].[commit_flag] AS [commit_flag], 
+    [t_batch].[details_group] AS [details_group], 
+    [t_batch].[max_db_errors] AS [max_db_errors], 
+    [t_batch].[ol_activation_code] AS [ol_activation_code], 
+    [t_batch].[auto_activation_code] AS [auto_activation_code], 
+    [t_batch].[entity_key] AS [entity_key], 
+    [t_batch].[uniqid] AS [uniqid], 
+    [t_batch].[discriminator] AS [discriminator]
+    FROM [dbo].[t_batch] AS [t_batch]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="t_task" EntityType="Self.t_task" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [t_task].[task_id] AS [task_id], 
+    [t_task].[task_name] AS [task_name], 
+    [t_task].[opening_reg_date] AS [opening_reg_date], 
+    [t_task].[opening_user_id] AS [opening_user_id], 
+    [t_task].[interface_type] AS [interface_type], 
+    [t_task].[entry_point_name] AS [entry_point_name], 
+    [t_task].[task_run_name] AS [task_run_name], 
+    [t_task].[commit_frequency] AS [commit_frequency], 
+    [t_task].[comment_text] AS [comment_text], 
+    [t_task].[entity_key] AS [entity_key], 
+    [t_task].[post_task] AS [post_task], 
+    [t_task].[pre_task] AS [pre_task], 
+    [t_task].[chunk_param] AS [chunk_param], 
+    [t_task].[chunk_flag] AS [chunk_flag], 
+    [t_task].[chunk_type] AS [chunk_type], 
+    [t_task].[failure_action] AS [failure_action], 
+    [t_task].[timeout_seconds] AS [timeout_seconds], 
+    [t_task].[num_retries] AS [num_retries], 
+    [t_task].[counter_inc] AS [counter_inc], 
+    [t_task].[max_items_before_memory_claen] AS [max_items_before_memory_claen], 
+    [t_task].[uniqid] AS [uniqid], 
+    [t_task].[discriminator] AS [discriminator], 
+    [t_task].[activity_code] AS [activity_code]
+    FROM [dbo].[t_task] AS [t_task]</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="alis_uatModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="g_batch_audit">
+          <Key>
+            <PropertyRef Name="pk" />
+          </Key>
+          <Property Name="pk" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="entry_type" Type="Int16" Nullable="false" />
+          <Property Name="entry_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="primary_key_type" Type="Int16" />
+          <Property Name="primary_key" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="secondary_key_type" Type="Int16" />
+          <Property Name="secondary_key" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="third_key_type" Type="Int16" />
+          <Property Name="third_key" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="reference" Type="Int32" />
+          <Property Name="batch_run_num" Type="Int32" />
+          <Property Name="batch_id" Type="Int32" />
+          <Property Name="task_id" Type="Int32" />
+          <Property Name="error_no" Type="Int32" />
+          <Property Name="description" Type="String" MaxLength="2000" FixedLength="false" Unicode="false" />
+          <Property Name="assigned_team_no" Type="Int32" />
+          <Property Name="assigned_user_id" Type="Int32" />
+          <Property Name="chunk_id" Type="Int32" />
+          <Property Name="server_name" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="pid" Type="Int32" />
+          <Property Name="discriminator" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="t_batch">
+          <Key>
+            <PropertyRef Name="uniqid" />
+          </Key>
+          <Property Name="batch_id" Type="Int32" Nullable="false" />
+          <Property Name="batch_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="status" Type="Int16" Nullable="false" />
+          <Property Name="output_frequency" Type="Int16" />
+          <Property Name="commit_flag" Type="Int16" Nullable="false" />
+          <Property Name="details_group" Type="Int16" />
+          <Property Name="max_db_errors" Type="Int16" />
+          <Property Name="ol_activation_code" Type="Int16" />
+          <Property Name="auto_activation_code" Type="Int16" />
+          <Property Name="entity_key" Type="Int32" Nullable="false" />
+          <Property Name="uniqid" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="discriminator" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="t_task">
+          <Key>
+            <PropertyRef Name="uniqid" />
+          </Key>
+          <Property Name="task_id" Type="Int32" Nullable="false" />
+          <Property Name="task_name" Type="String" MaxLength="40" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="opening_reg_date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="opening_user_id" Type="Int32" Nullable="false" />
+          <Property Name="interface_type" Type="Int16" Nullable="false" />
+          <Property Name="entry_point_name" Type="String" MaxLength="40" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="task_run_name" Type="String" MaxLength="40" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="commit_frequency" Type="Int16" Nullable="false" />
+          <Property Name="comment_text" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="entity_key" Type="Int32" Nullable="false" />
+          <Property Name="post_task" Type="Int32" />
+          <Property Name="pre_task" Type="Int32" />
+          <Property Name="chunk_param" Type="Int32" />
+          <Property Name="chunk_flag" Type="Int32" />
+          <Property Name="chunk_type" Type="Int32" />
+          <Property Name="failure_action" Type="Int32" Nullable="false" />
+          <Property Name="timeout_seconds" Type="Int32" Nullable="false" />
+          <Property Name="num_retries" Type="Int32" Nullable="false" />
+          <Property Name="counter_inc" Type="Int32" Nullable="false" />
+          <Property Name="max_items_before_memory_claen" Type="Int16" />
+          <Property Name="uniqid" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="discriminator" Type="Int32" Nullable="false" />
+          <Property Name="activity_code" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="alis_uatEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="g_batch_audit" EntityType="Self.g_batch_audit" />
+          <EntitySet Name="t_batch" EntityType="Self.t_batch" />
+          <EntitySet Name="t_task" EntityType="Self.t_task" />
+          <EntitySet Name="sys_auth_data" EntityType="alis_uatModel.sys_auth_data" />
+        </EntityContainer>
+        <EntityType Name="sys_auth_data">
+          <Key>
+            <PropertyRef Name="db_name" />
+            <PropertyRef Name="log_id" />
+            <PropertyRef Name="default_data" />
+            <PropertyRef Name="company_id" />
+            <PropertyRef Name="show_flag" />
+            <PropertyRef Name="uniqid" />
+            <PropertyRef Name="discriminator" />
+          </Key>
+          <Property Name="dbms" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="db_name" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="log_id" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="log_pw" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="server_name" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="dbparm" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="default_data" Type="Int16" Nullable="false" />
+          <Property Name="company_id" Type="Int32" Nullable="false" />
+          <Property Name="company_name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="sec_db_name" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="web_company_id" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="external_authentication_code" Type="Int16" />
+          <Property Name="show_flag" Type="Int16" Nullable="false" />
+          <Property Name="linked_server" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="j2ee_datasource" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="jdbc_connect_string" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="driver" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="port_number" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="schema_name" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="rdbms" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="uniqid" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="driver_params" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="discriminator" Type="Int32" Nullable="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="alis_uatModelStoreContainer" CdmEntityContainer="alis_uatEntities">
+          <EntitySetMapping Name="g_batch_audit">
+            <EntityTypeMapping TypeName="alis_uatModel.g_batch_audit">
+              <MappingFragment StoreEntitySet="g_batch_audit">
+                <ScalarProperty Name="pk" ColumnName="pk" />
+                <ScalarProperty Name="entry_type" ColumnName="entry_type" />
+                <ScalarProperty Name="entry_time" ColumnName="entry_time" />
+                <ScalarProperty Name="primary_key_type" ColumnName="primary_key_type" />
+                <ScalarProperty Name="primary_key" ColumnName="primary_key" />
+                <ScalarProperty Name="secondary_key_type" ColumnName="secondary_key_type" />
+                <ScalarProperty Name="secondary_key" ColumnName="secondary_key" />
+                <ScalarProperty Name="third_key_type" ColumnName="third_key_type" />
+                <ScalarProperty Name="third_key" ColumnName="third_key" />
+                <ScalarProperty Name="reference" ColumnName="reference" />
+                <ScalarProperty Name="batch_run_num" ColumnName="batch_run_num" />
+                <ScalarProperty Name="batch_id" ColumnName="batch_id" />
+                <ScalarProperty Name="task_id" ColumnName="task_id" />
+                <ScalarProperty Name="error_no" ColumnName="error_no" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="assigned_team_no" ColumnName="assigned_team_no" />
+                <ScalarProperty Name="assigned_user_id" ColumnName="assigned_user_id" />
+                <ScalarProperty Name="chunk_id" ColumnName="chunk_id" />
+                <ScalarProperty Name="server_name" ColumnName="server_name" />
+                <ScalarProperty Name="pid" ColumnName="pid" />
+                <ScalarProperty Name="discriminator" ColumnName="discriminator" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="t_batch">
+            <EntityTypeMapping TypeName="alis_uatModel.t_batch">
+              <MappingFragment StoreEntitySet="t_batch">
+                <ScalarProperty Name="batch_id" ColumnName="batch_id" />
+                <ScalarProperty Name="batch_name" ColumnName="batch_name" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="output_frequency" ColumnName="output_frequency" />
+                <ScalarProperty Name="commit_flag" ColumnName="commit_flag" />
+                <ScalarProperty Name="details_group" ColumnName="details_group" />
+                <ScalarProperty Name="max_db_errors" ColumnName="max_db_errors" />
+                <ScalarProperty Name="ol_activation_code" ColumnName="ol_activation_code" />
+                <ScalarProperty Name="auto_activation_code" ColumnName="auto_activation_code" />
+                <ScalarProperty Name="entity_key" ColumnName="entity_key" />
+                <ScalarProperty Name="uniqid" ColumnName="uniqid" />
+                <ScalarProperty Name="discriminator" ColumnName="discriminator" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="t_task">
+            <EntityTypeMapping TypeName="alis_uatModel.t_task">
+              <MappingFragment StoreEntitySet="t_task">
+                <ScalarProperty Name="task_id" ColumnName="task_id" />
+                <ScalarProperty Name="task_name" ColumnName="task_name" />
+                <ScalarProperty Name="opening_reg_date" ColumnName="opening_reg_date" />
+                <ScalarProperty Name="opening_user_id" ColumnName="opening_user_id" />
+                <ScalarProperty Name="interface_type" ColumnName="interface_type" />
+                <ScalarProperty Name="entry_point_name" ColumnName="entry_point_name" />
+                <ScalarProperty Name="task_run_name" ColumnName="task_run_name" />
+                <ScalarProperty Name="commit_frequency" ColumnName="commit_frequency" />
+                <ScalarProperty Name="comment_text" ColumnName="comment_text" />
+                <ScalarProperty Name="entity_key" ColumnName="entity_key" />
+                <ScalarProperty Name="post_task" ColumnName="post_task" />
+                <ScalarProperty Name="pre_task" ColumnName="pre_task" />
+                <ScalarProperty Name="chunk_param" ColumnName="chunk_param" />
+                <ScalarProperty Name="chunk_flag" ColumnName="chunk_flag" />
+                <ScalarProperty Name="chunk_type" ColumnName="chunk_type" />
+                <ScalarProperty Name="failure_action" ColumnName="failure_action" />
+                <ScalarProperty Name="timeout_seconds" ColumnName="timeout_seconds" />
+                <ScalarProperty Name="num_retries" ColumnName="num_retries" />
+                <ScalarProperty Name="counter_inc" ColumnName="counter_inc" />
+                <ScalarProperty Name="max_items_before_memory_claen" ColumnName="max_items_before_memory_claen" />
+                <ScalarProperty Name="uniqid" ColumnName="uniqid" />
+                <ScalarProperty Name="discriminator" ColumnName="discriminator" />
+                <ScalarProperty Name="activity_code" ColumnName="activity_code" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sys_auth_data">
+            <EntityTypeMapping TypeName="alis_uatModel.sys_auth_data">
+              <MappingFragment StoreEntitySet="sys_auth_data">
+                <ScalarProperty Name="discriminator" ColumnName="discriminator" />
+                <ScalarProperty Name="driver_params" ColumnName="driver_params" />
+                <ScalarProperty Name="uniqid" ColumnName="uniqid" />
+                <ScalarProperty Name="rdbms" ColumnName="rdbms" />
+                <ScalarProperty Name="schema_name" ColumnName="schema_name" />
+                <ScalarProperty Name="port_number" ColumnName="port_number" />
+                <ScalarProperty Name="driver" ColumnName="driver" />
+                <ScalarProperty Name="jdbc_connect_string" ColumnName="jdbc_connect_string" />
+                <ScalarProperty Name="j2ee_datasource" ColumnName="j2ee_datasource" />
+                <ScalarProperty Name="linked_server" ColumnName="linked_server" />
+                <ScalarProperty Name="show_flag" ColumnName="show_flag" />
+                <ScalarProperty Name="external_authentication_code" ColumnName="external_authentication_code" />
+                <ScalarProperty Name="web_company_id" ColumnName="web_company_id" />
+                <ScalarProperty Name="sec_db_name" ColumnName="sec_db_name" />
+                <ScalarProperty Name="company_name" ColumnName="company_name" />
+                <ScalarProperty Name="company_id" ColumnName="company_id" />
+                <ScalarProperty Name="default_data" ColumnName="default_data" />
+                <ScalarProperty Name="dbparm" ColumnName="dbparm" />
+                <ScalarProperty Name="server_name" ColumnName="server_name" />
+                <ScalarProperty Name="log_pw" ColumnName="log_pw" />
+                <ScalarProperty Name="log_id" ColumnName="log_id" />
+                <ScalarProperty Name="db_name" ColumnName="db_name" />
+                <ScalarProperty Name="dbms" ColumnName="dbms" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
