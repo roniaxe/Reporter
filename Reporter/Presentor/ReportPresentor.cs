@@ -4,7 +4,8 @@ using System.Text.RegularExpressions;
 using Reporter.Model;
 using Reporter.View;
 using System.Configuration;
-using System.Data.Entity.Core.EntityClient;
+using Reporter.DataLayer;
+using Reporter.Utils;
 
 namespace Reporter.Presentor
 {
@@ -12,12 +13,20 @@ namespace Reporter.Presentor
     {
         private readonly IReportView _view;
         private string _connectionString;
+        private string SelectedDb => _view.DbComboBox.SelectedItem.ToString();
+        private string SelectedEnv => _view.EnvComboBox.SelectedItem.ToString();
 
         public ReportPresentor(IReportView view)
         {
             _view = view;
             SetViewPropertiesFromModel();
             WireUpViewEvents();
+            PopulateEmailList();
+        }
+
+        private void PopulateEmailList()
+        {
+            _view.EmailList.DataSource = PersonService.GetAll();
         }
 
         private void WireUpViewEvents()
@@ -34,9 +43,8 @@ namespace Reporter.Presentor
 
         private void EnvComboBoxChangedAction()
         {
-            //_view.DbComboBox.DataSource = null;
-            if (string.IsNullOrEmpty(_view.EnvComboBox.SelectedItem.ToString())) return;
-            using (var db = new alis_uatEntities(_view.EnvComboBox.SelectedItem.ToString()))
+            if (string.IsNullOrEmpty(SelectedEnv)) return;
+            using (var db = new alis_uatEntities(SelectedEnv))
             {
                 _view.DbComboBox.DataSource = db.sys_auth_data.Select(sad => sad.db_name).ToList();
             }
@@ -44,23 +52,24 @@ namespace Reporter.Presentor
 
         private void BuildConnectionString()
         {
-            var connection = ConfigurationManager.ConnectionStrings[_view.EnvComboBox.SelectedItem.ToString()].ConnectionString;           
-            EntityConnectionStringBuilder existing = new EntityConnectionStringBuilder(connection);
-            System.Data.SqlClient.SqlConnectionStringBuilder builder =
-                new System.Data.SqlClient.SqlConnectionStringBuilder(existing.ProviderConnectionString)
-                {
-                    ["Initial Catalog"] = _view.DbComboBox.SelectedItem.ToString()
-                };
-            existing.ProviderConnectionString = builder.ConnectionString;           
-            existing.ConnectionString = existing.ConnectionString.Replace("Application Name", "App");
-            Console.WriteLine(connection);
-            Console.WriteLine(existing.ConnectionString);
-            _connectionString = existing.ConnectionString;
+            var connection = ConfigurationManager.ConnectionStrings[SelectedEnv].ConnectionString;
+            var catalogPos = connection.IndexOf("initial catalog=", StringComparison.Ordinal) + "initial catalog=".Length;
+            var catalogPosEnd = connection.IndexOf(';', catalogPos);
+            var oldCatalogName = connection.Substring(catalogPos, catalogPosEnd-catalogPos);
+            connection = connection.Replace(oldCatalogName, SelectedDb);
+            //var existing = new EntityConnectionStringBuilder(connection);
+            //var builder = new System.Data.SqlClient.SqlConnectionStringBuilder(existing.ProviderConnectionString)
+            //    {
+            //        ["Initial Catalog"] = SelectedDb
+            //};
+            //existing.ProviderConnectionString = builder.ConnectionString;           
+            //existing.ConnectionString = existing.ConnectionString.Replace("Application Name", "App");
+            _connectionString = connection;
         }
 
         private void CreateButtonClickAction()
         {
-            using (var db = new alis_uatEntities(_connectionString,""))
+            using (var db = new alis_uatEntities(_connectionString))
             {
                 var q = (from gBatchAudit in db.g_batch_audit
                          where gBatchAudit.entry_time >= _view.FromDate.Value &&
@@ -87,13 +96,15 @@ namespace Reporter.Presentor
                     select new
                     {
                         Message = groupedQuery.Key.description,
+                        Date = groupedQuery.Min(d => d.BatchAudit.entry_time),
                         groupedQuery.Key.Batch,
                         groupedQuery.Key.Task,
                         BatchRunNumber = groupedQuery.Key.batch_run_num,
                         Count = groupedQuery.Count()
                     };
 
-                _view.DataGridView.DataSource = newQ.ToList();
+                var sortedList = newQ.ToSbl();
+                _view.DataGridView.DataSource = sortedList;
             }
         }
 

@@ -9,18 +9,17 @@
 
 namespace Reporter.Model
 {
-    using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
-    
+
     public partial class alis_uatEntities : DbContext
     {
         public alis_uatEntities()
             : base("name=alis_uatEntities")
         {
         }
-        public alis_uatEntities(string connString, string nameOrFull = "name=")
-            : base($@"{nameOrFull}{connString}")
+        public alis_uatEntities(string connString)
+            : base(connString)
         {
         }
 

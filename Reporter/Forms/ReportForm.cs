@@ -41,6 +41,12 @@ namespace Reporter.Forms
             set => comboBox2 = value;
         }
 
+        public ListBox EmailList
+        {
+            get => listBox1;
+            set => listBox1 = value;
+        }
+
         public ReportForm()
         {
             InitializeComponent();

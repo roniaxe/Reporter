@@ -20,5 +20,7 @@ namespace Reporter.View
         ComboBox EnvComboBox { get; set; }
 
         ComboBox DbComboBox { get; set; }
+
+        ListBox EmailList { get; set; }
     }
 }
