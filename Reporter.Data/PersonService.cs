@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Reporter.Model;
 
-namespace Reporter.DataLayer
+namespace Reporter.Data
 {
     public static class PersonService
     {

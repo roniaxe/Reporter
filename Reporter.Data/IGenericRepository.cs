@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Reporter.DataLayer
+namespace Reporter.Data
 {
     public interface IGenericRepository<T>
     {

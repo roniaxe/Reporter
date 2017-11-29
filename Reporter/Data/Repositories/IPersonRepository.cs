@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Reporter.Model;
 
-namespace Reporter.DataLayer
+namespace Reporter.Data.Repositories
 {
     public interface IPersonRepository : IGenericRepository<Person>
     {
-        
+        void Remove(Person person);
     }
 
     public class PersonRepository : IPersonRepository
@@ -46,6 +47,16 @@ namespace Reporter.DataLayer
                 db.Entry(person).State = EntityState.Modified;
                 db.SaveChanges();
 
+            }
+        }
+
+        public void Remove(Person person)
+        {
+            using (var db = new ReporterCompactModel())
+            {
+                db.Persons.Attach(person);
+                db.Persons.Remove(person);
+                db.SaveChanges();
             }
         }
     }

@@ -14,15 +14,7 @@ namespace Reporter
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            try
-            {
-                Application.Run(new MainForm());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
+            Application.Run(new MainForm());
         }
     }
 }

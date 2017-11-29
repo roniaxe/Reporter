@@ -1,16 +1,38 @@
 ﻿using System;
-using System.Linq;
 using System.Windows.Forms;
-using Reporter.Model;
 using Reporter.View;
 
 namespace Reporter.Forms
 {
     public partial class ReportForm : Form, IReportView
     {
+        public event Action AddedPerson;
+        public event Action DeletedPerson;
         public event Action CreateButtonPressed;
         public event Action EnvComboBoxChanged;
         public event Action DbComboBoxChanged;
+        public event Action<object, DataGridViewCellEventArgs> DgvCellDoubleClicked;
+
+        public ReportForm()
+        {
+            InitializeComponent();
+            RunButton.Click += CreateButtonClicked;
+            comboBox1.SelectedIndexChanged += InvokeEnvComboBoxChanged;
+            comboBox2.SelectedIndexChanged += InvokeDbComboBoxChanged;
+            dataGridView1.CellDoubleClick += InvokeCellDoubleClick;
+            btnAdd.Click += AddPersonBtnClicked;
+            btnDelete.Click += DeletePersonBtnClicked;
+        }
+
+        private void DeletePersonBtnClicked(object sender, EventArgs e)
+        {
+            DeletedPerson?.Invoke();
+        }
+
+        private void AddPersonBtnClicked(object sender, EventArgs e)
+        {
+            AddedPerson?.Invoke();
+        }
 
         public DataGridView DataGridView
         {
@@ -41,18 +63,27 @@ namespace Reporter.Forms
             set => comboBox2 = value;
         }
 
-        public ListBox EmailList
+        public DataGridView EmailList
         {
-            get => listBox1;
-            set => listBox1 = value;
+            get => dataGridView2;
+            set => dataGridView2 = value;
         }
 
-        public ReportForm()
+        public ProgressBar ProgressBar
         {
-            InitializeComponent();
-            CreateButton.Click += CreateButtonClicked;
-            comboBox1.SelectedIndexChanged += InvokeEnvComboBoxChanged;
-            comboBox2.SelectedIndexChanged += InvokeDbComboBoxChanged;
+            get => progressBar1;
+            set => progressBar1 = value;
+        }
+
+        public BindingSource PersonBindingSource
+        {
+            get => personBindingSource;
+            set => personBindingSource = value;
+        }
+
+        private void InvokeCellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DgvCellDoubleClicked?.Invoke(sender, e);
         }
 
         private void InvokeDbComboBoxChanged(object sender, EventArgs e)

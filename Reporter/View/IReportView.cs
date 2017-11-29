@@ -5,11 +5,17 @@ namespace Reporter.View
 {
     public interface IReportView
     {
+        event Action AddedPerson;
+
+        event Action DeletedPerson;
+
         event Action CreateButtonPressed;
 
         event Action EnvComboBoxChanged;
 
         event Action DbComboBoxChanged;
+
+        event Action<object, DataGridViewCellEventArgs> DgvCellDoubleClicked;
 
         DataGridView DataGridView { get; set; }
 
@@ -21,6 +27,10 @@ namespace Reporter.View
 
         ComboBox DbComboBox { get; set; }
 
-        ListBox EmailList { get; set; }
+        DataGridView EmailList { get; set; }
+
+        ProgressBar ProgressBar { get; set; }
+
+        BindingSource PersonBindingSource { get; set; }
     }
 }
