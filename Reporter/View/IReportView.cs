@@ -11,6 +11,8 @@ namespace Reporter.View
 
         event Action CreateButtonPressed;
 
+        event Action RunButtonPressed;
+
         event Action EnvComboBoxChanged;
 
         event Action DbComboBoxChanged;

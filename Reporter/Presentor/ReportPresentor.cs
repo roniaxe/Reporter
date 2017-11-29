@@ -7,6 +7,7 @@ using Reporter.Model;
 using Reporter.View;
 using Reporter.Data.Services;
 using Reporter.Forms;
+using Reporter.Utils;
 using Reporter.ViewModel;
 
 namespace Reporter.Presentor
@@ -36,12 +37,27 @@ namespace Reporter.Presentor
 
         private void WireUpViewEvents()
         {
-            _view.CreateButtonPressed += CreateButtonClickActionAsync;
+            _view.RunButtonPressed += RunButtonClickActionAsync;
             _view.EnvComboBoxChanged += EnvComboBoxChangedAction;
             _view.DbComboBoxChanged += DbComboBoxChangedAction;
             _view.DgvCellDoubleClicked += DgvCellDoubleClickAction;
             _view.AddedPerson += AddPersonAction;
             _view.DeletedPerson += DeletePersonAction;
+            _view.CreateButtonPressed += CreateReportButtonAction;
+        }
+
+        private void CreateReportButtonAction()
+        {
+            if (_view.EmailList.Rows.Count == 0)
+            {
+                MessageBox.Show(@"Empty Distribution List", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (MessageBox.Show(@"Send Report?", @"Report Distribution", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                var attachment = TableToExcelManager.ExportToExcel(_view.DataGridView, SelectedEnv, SelectedDb);
+                DistributionManager.SendReport(attachment, SelectedEnv, SelectedDb);
+            }            
         }
 
         private void DeletePersonAction()
@@ -107,7 +123,7 @@ namespace Reporter.Presentor
             _connectionString = connection;
         }
 
-        private async void CreateButtonClickActionAsync()
+        private async void RunButtonClickActionAsync()
         {
             _view.ProgressBar.Visible = true;
             _view.DataGridView.DataSource = await Task.Run(() => BatchAuditService.GetErrorGroups(_view, _connectionString));

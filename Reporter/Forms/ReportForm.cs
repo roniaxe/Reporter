@@ -12,16 +12,23 @@ namespace Reporter.Forms
         public event Action EnvComboBoxChanged;
         public event Action DbComboBoxChanged;
         public event Action<object, DataGridViewCellEventArgs> DgvCellDoubleClicked;
+        public event Action RunButtonPressed;
 
         public ReportForm()
         {
             InitializeComponent();
-            RunButton.Click += CreateButtonClicked;
+            RunButton.Click += RunButtonClicked;
             comboBox1.SelectedIndexChanged += InvokeEnvComboBoxChanged;
             comboBox2.SelectedIndexChanged += InvokeDbComboBoxChanged;
             dataGridView1.CellDoubleClick += InvokeCellDoubleClick;
             btnAdd.Click += AddPersonBtnClicked;
             btnDelete.Click += DeletePersonBtnClicked;
+            CreateButton.Click += CreateReportButtonPressed;
+        }
+
+        private void CreateReportButtonPressed(object sender, EventArgs e)
+        {
+            CreateButtonPressed?.Invoke();
         }
 
         private void DeletePersonBtnClicked(object sender, EventArgs e)
@@ -96,9 +103,9 @@ namespace Reporter.Forms
             EnvComboBoxChanged?.Invoke();
         }
 
-        private void CreateButtonClicked(object sender, EventArgs e)
+        private void RunButtonClicked(object sender, EventArgs e)
         {
-            CreateButtonPressed?.Invoke();
+            RunButtonPressed?.Invoke();
         }
     }
 }
