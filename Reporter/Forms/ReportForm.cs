@@ -88,6 +88,12 @@ namespace Reporter.Forms
             set => personBindingSource = value;
         }
 
+        public DataGridView DataGridView2
+        {
+            get => dataGridView3;
+            set => dataGridView3 = value;
+        }
+
         private void InvokeCellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             DgvCellDoubleClicked?.Invoke(sender, e);

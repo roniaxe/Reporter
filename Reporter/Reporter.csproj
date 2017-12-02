@@ -114,6 +114,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Presentor\AddEditPersonPresentor.cs" />
     <Compile Include="Utils\DistributionManager.cs" />
+    <Compile Include="Utils\IEnumerableToDataTable.cs" />
     <Compile Include="Utils\TableToExcelManager.cs" />
     <Compile Include="ViewModel\ErrorCommentConn.cs" />
     <Compile Include="Model\g_batch_audit.cs">

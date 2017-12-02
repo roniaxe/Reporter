@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -32,7 +34,7 @@ namespace Reporter.Presentor
         public void PopulateEmailList()
         {
             _view.PersonBindingSource.DataSource = null;
-            _view.PersonBindingSource.DataSource = PersonService.GetAll();
+            _view.PersonBindingSource.DataSource = PersonService.GetAll();            
         }
 
         private void WireUpViewEvents()
@@ -48,16 +50,18 @@ namespace Reporter.Presentor
 
         private void CreateReportButtonAction()
         {
-            if (_view.EmailList.Rows.Count == 0)
+            if (MessageBox.Show(@"Create Report?", @"Report Distribution", 
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                MessageBox.Show(@"Empty Distribution List", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                var grids = new List<DataGridView> {_view.DataGridView, _view.DataGridView2};
+                var attachment = TableToExcelManager.ExportToExcel(grids, SelectedEnv, SelectedDb);
+                if (_view.EmailList.Rows.Count <= 0) return;
+                if (MessageBox.Show(@"Send Report to distribution list?", @"Report Distribution",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    DistributionManager.SendReport(attachment, SelectedEnv, SelectedDb);
+                }
             }
-            if (MessageBox.Show(@"Send Report?", @"Report Distribution", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                var attachment = TableToExcelManager.ExportToExcel(_view.DataGridView, SelectedEnv, SelectedDb);
-                DistributionManager.SendReport(attachment, SelectedEnv, SelectedDb);
-            }            
         }
 
         private void DeletePersonAction()
@@ -126,7 +130,11 @@ namespace Reporter.Presentor
         private async void RunButtonClickActionAsync()
         {
             _view.ProgressBar.Visible = true;
-            _view.DataGridView.DataSource = await Task.Run(() => BatchAuditService.GetErrorGroups(_view, _connectionString));
+            Task<object> errorsTask = Task.Run(() => BatchAuditService.GetErrorGroups(_view, _connectionString));
+            Task<DataTable> batchStatTask = Task.Run(() => BatchAuditService.BatchStatistics(_view, _connectionString));
+            //await Task.WhenAll(errorsTask, batchStatTask);
+            _view.DataGridView.DataSource = await errorsTask;
+            _view.DataGridView2.DataSource = await batchStatTask;          
             _view.ProgressBar.Visible = false;
         }
 

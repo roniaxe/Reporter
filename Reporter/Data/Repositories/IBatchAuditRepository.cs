@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -13,6 +15,7 @@ namespace Reporter.Data.Repositories
     internal interface IBatchAuditRepository : IGenericRepository<g_batch_audit>
     {
         object GetErrorGroups(IReportView view, string connString);
+        DataTable BatchStatistics(IReportView view, string connString);
     }
 
     internal class BatchAuditRepository : IBatchAuditRepository
@@ -57,6 +60,7 @@ namespace Reporter.Data.Repositories
         {
             using (var db = new alis_uatEntities(connString))
             {
+                db.Database.CommandTimeout = 4 * 60;
                 var q = (from gBatchAudit in db.g_batch_audit
                     where gBatchAudit.entry_time >= view.FromDate.Value.Date &&
                           gBatchAudit.entry_time < view.ToDate.Value.Date &&
@@ -90,12 +94,38 @@ namespace Reporter.Data.Repositories
                         Date = groupedQuery.Min(d => d.BatchAudit.entry_time),
                         groupedQuery.Key.Batch,
                         groupedQuery.Key.Task,
-                        BatchRunNumber = groupedQuery.Key.batch_run_num,
+                        BatchRunNumber = groupedQuery.Key.batch_run_num,                        
                         Count = groupedQuery.Count()
                     };
 
                 var sortedList = newQ.ToSbl();
                 return sortedList;
+            }
+        }
+
+        public DataTable BatchStatistics(IReportView view, string connString)
+        {
+            using (var db = new alis_uatEntities(connString))
+            {
+                db.Database.CommandTimeout = 4 * 60;
+                var q = from gba in db.g_batch_audit
+                    where gba.entry_time > view.FromDate.Value.Date && gba.entry_time < view.ToDate.Value.Date
+                          && gba.entry_type == 3 && gba.description.Contains("completed , reached")
+                    join tTask in db.t_task on gba.task_id equals tTask.task_id
+                    join tBatch in db.t_batch on gba.batch_id equals tBatch.batch_id
+                    group gba by new {tTask.task_name, tBatch.batch_name, gba.batch_run_num}
+                    into grouped
+                    select new
+                    {
+                        grouped.Key.batch_run_num,
+                        grouped.Key.batch_name,
+                        grouped.Key.task_name,
+                        TotalTime = DbFunctions.DiffMinutes(grouped.Min(g => g.entry_time), grouped.Max(g => g.entry_time)),
+                        //TotalTime = (grouped.Max(g => g.entry_time) - grouped.Min(g => g.entry_time)).TotalMinutes.ToString("F"),
+                        Proccessed = grouped.Count()
+                    };
+                var y = q.ToList();
+                return IEnumerableToDataTable.ToDataTable(y);
             }
         }
     }

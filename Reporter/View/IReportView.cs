@@ -34,5 +34,7 @@ namespace Reporter.View
         ProgressBar ProgressBar { get; set; }
 
         BindingSource PersonBindingSource { get; set; }
+
+        DataGridView DataGridView2 { get; set; }
     }
 }

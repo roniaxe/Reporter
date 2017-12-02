@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Excel;
 using Application = Microsoft.Office.Interop.Excel.Application;
@@ -7,7 +8,7 @@ namespace Reporter.Utils
 {
     public static class TableToExcelManager
     {
-        public static string ExportToExcel(DataGridView table, string env, string db)
+        public static string ExportToExcel(List<DataGridView> tables, string env, string db)
         {
             // Creating a Excel object. 
             _Application excel = new Application();
@@ -15,31 +16,37 @@ namespace Reporter.Utils
             string fileName = null;
             try
             {
-                _Worksheet worksheet = workbook.ActiveSheet;
-
-                worksheet.Name = DateTime.Today.ToString("M");
-                var cellRowIndex = 1;
-                var cellColumnIndex = 1;
-
-                //Loop through each row and read value from each column. 
-                for (var i = 0; i < table.Rows.Count; i++)
+                for (int x = 0; x < tables.Count; x++)
                 {
-                    for (var j = 0; j < table.Columns.Count; j++)
-                    {
-                        // Excel index starts from 1,1. As first Row would have the Column headers, adding a condition check. 
-                        if (cellRowIndex == 1)
-                            worksheet.Cells[cellRowIndex, cellColumnIndex] = table.Columns[j].HeaderText;
-                        else
-                            worksheet.Cells[cellRowIndex, cellColumnIndex] =
-                                table.Rows[i - 1].Cells[j].Value?.ToString();
-                        cellColumnIndex++;
-                    }
-                    cellColumnIndex = 1;
-                    cellRowIndex++;
+                    _Worksheet worksheet = workbook.Sheets.Add();
+                    worksheet.Name = $@"Errors Sheet - {x+1}";
+                    var cellRowIndex = 1;
+                    var cellColumnIndex = 1;
+
+                    //Loop through each row and read value from each column. 
+                    for (var i = 0; i < tables[x].Rows.Count; i++)
+                     {
+                     for (var j = 0; j < tables[x].Columns.Count; j++)
+                     {
+                      // Excel index starts from 1,1. As first Row would have the Column headers, adding a condition check. 
+                     if (cellRowIndex == 1)
+                                                worksheet.Cells[cellRowIndex, cellColumnIndex] = tables[x].Columns[j].HeaderText;
+                                            else
+                                                worksheet.Cells[cellRowIndex, cellColumnIndex] =
+                                                    tables[x].Rows[i].Cells[j].Value?.ToString();
+                                            cellColumnIndex++;
+                                        }
+                                        cellColumnIndex = 1;
+                                        cellRowIndex++;
+                                    }
+                                    worksheet.Columns.AutoFit();
+                                    worksheet.Range["A1:Z100"].WrapText = false;
+                                    worksheet.Cells[1, 1].EntireRow.Font.Bold = true;                
                 }
-                worksheet.Columns.AutoFit();
-                worksheet.Range["A1:Z100"].WrapText = false;
-                worksheet.Cells[1, 1].EntireRow.Font.Bold = true;
+                
+                
+
+
                 //Getting the location and file name of the excel to save from user. 
                 var saveDialog =
                     new SaveFileDialog
