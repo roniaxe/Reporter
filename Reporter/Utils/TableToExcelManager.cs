@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Excel;
 using Application = Microsoft.Office.Interop.Excel.Application;
@@ -16,56 +17,61 @@ namespace Reporter.Utils
             string fileName = null;
             try
             {
-                for (int x = 0; x < tables.Count; x++)
+                foreach (DataGridView table in tables)
                 {
                     _Worksheet worksheet = workbook.Sheets.Add();
-                    worksheet.Name = $@"Errors Sheet - {x+1}";
+                    worksheet.Name = table.Tag as string;
                     var cellRowIndex = 1;
                     var cellColumnIndex = 1;
 
                     //Loop through each row and read value from each column. 
-                    for (var i = 0; i < tables[x].Rows.Count; i++)
-                     {
-                     for (var j = 0; j < tables[x].Columns.Count; j++)
-                     {
-                      // Excel index starts from 1,1. As first Row would have the Column headers, adding a condition check. 
-                     if (cellRowIndex == 1)
-                                                worksheet.Cells[cellRowIndex, cellColumnIndex] = tables[x].Columns[j].HeaderText;
-                                            else
-                                                worksheet.Cells[cellRowIndex, cellColumnIndex] =
-                                                    tables[x].Rows[i].Cells[j].Value?.ToString();
-                                            cellColumnIndex++;
-                                        }
-                                        cellColumnIndex = 1;
-                                        cellRowIndex++;
-                                    }
-                                    worksheet.Columns.AutoFit();
-                                    worksheet.Range["A1:Z100"].WrapText = false;
-                                    worksheet.Cells[1, 1].EntireRow.Font.Bold = true;                
-                }
-                
-                
-
-
-                //Getting the location and file name of the excel to save from user. 
-                var saveDialog =
-                    new SaveFileDialog
+                    for (var i = 0; i < table.Rows.Count; i++)
                     {
-                        Filter = @"Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*",
-                        FilterIndex = 2,
-                        FileName = 
-                        Environment.GetFolderPath(Environment.SpecialFolder.Desktop) 
-                        + @"\Daily_Report_" + env
-                        + "_" + db
-                        + "_" + DateTime.Today.ToString("M") + ".xlsx"
-                    };
-
-                if (saveDialog.ShowDialog() == DialogResult.OK)
-                {
-                    workbook.SaveAs(saveDialog.FileName);
-                    MessageBox.Show(@"Export Successful");
+                        for (var j = 0; j < table.Columns.Count; j++)
+                        {
+                            // Excel index starts from 1,1. As first Row would have the Column headers, adding a condition check. 
+                            if (cellRowIndex == 1)
+                                worksheet.Cells[cellRowIndex, cellColumnIndex] = table.Columns[j].HeaderText;
+                            else
+                                worksheet.Cells[cellRowIndex, cellColumnIndex] =
+                                    table.Rows[i].Cells[j].Value?.ToString();
+                            cellColumnIndex++;
+                        }
+                        cellColumnIndex = 1;
+                        cellRowIndex++;
+                    }
+                    worksheet.Columns.AutoFit();
+                    worksheet.Range["A1:Z100"].WrapText = false;
+                    worksheet.Cells[1, 1].EntireRow.Font.Bold = true;
                 }
-                fileName = saveDialog.FileName;
+
+                var t = new Thread(() =>
+                {
+                    //Getting the location and file name of the excel to save from user. 
+                    var saveDialog =
+                        new SaveFileDialog
+                        {
+                            Filter = @"Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*",
+                            FilterIndex = 2,
+                            FileName =
+                                Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                                + @"\Daily_Report_" + env
+                                + "_" + db
+                                + "_" + DateTime.Today.ToString("M") + ".xlsx"
+                        };
+
+                    if (saveDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        workbook.SaveAs(saveDialog.FileName);
+                        MessageBox.Show(@"Export Successful");
+                    }
+                    fileName = saveDialog.FileName;
+                });
+                t.SetApartmentState(ApartmentState.STA);
+                t.Start();
+                t.Join();
+                Console.WriteLine(fileName);
+
             }
             catch (Exception ex)
             {

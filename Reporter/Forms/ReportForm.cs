@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Reporter.View;
 
@@ -9,6 +10,7 @@ namespace Reporter.Forms
         public event Action AddedPerson;
         public event Action DeletedPerson;
         public event Action CreateButtonPressed;
+        public event Action CancelButtonPressed;
         public event Action EnvComboBoxChanged;
         public event Action DbComboBoxChanged;
         public event Action<object, DataGridViewCellEventArgs> DgvCellDoubleClicked;
@@ -24,6 +26,12 @@ namespace Reporter.Forms
             btnAdd.Click += AddPersonBtnClicked;
             btnDelete.Click += DeletePersonBtnClicked;
             CreateButton.Click += CreateReportButtonPressed;
+            _btnCncl.Click += CnclPressed;
+        }
+
+        private void CnclPressed(object sender, EventArgs e)
+        {
+            CancelButtonPressed?.Invoke();
         }
 
         private void CreateReportButtonPressed(object sender, EventArgs e)
@@ -92,6 +100,30 @@ namespace Reporter.Forms
         {
             get => dataGridView3;
             set => dataGridView3 = value;
+        }
+
+        public DataGridView DataGridView3
+        {
+            get => dataGridView4;
+            set => dataGridView4 = value;
+        }
+
+        public Button RunButton
+        {
+            get => btnRun;
+            set => btnRun = value;
+        }
+
+        public Button CnclButton
+        {
+            get => _btnCncl;
+            set => _btnCncl = value;
+        }
+
+        public DataGridView AllErrorsGrid
+        {
+            get => dataGridView5;
+            set => dataGridView5 = value;
         }
 
         private void InvokeCellDoubleClick(object sender, DataGridViewCellEventArgs e)

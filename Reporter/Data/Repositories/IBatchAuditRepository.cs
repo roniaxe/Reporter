@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Reporter.Data.Services;
 using Reporter.Model;
 using Reporter.Utils;
@@ -14,8 +13,10 @@ namespace Reporter.Data.Repositories
 {
     internal interface IBatchAuditRepository : IGenericRepository<g_batch_audit>
     {
-        object GetErrorGroups(IReportView view, string connString);
-        DataTable BatchStatistics(IReportView view, string connString);
+        Task<object> GetErrorGroups(IReportView view, string connString);
+        Task<object> GetBatchStatistics(IReportView view, string connString);
+        Task<object> GetTaskList(IReportView view, string connString);
+        Task<object> GetAllErrors(IReportView view, string connString);
     }
 
     internal class BatchAuditRepository : IBatchAuditRepository
@@ -56,12 +57,11 @@ namespace Reporter.Data.Repositories
             }
         }
 
-        public object GetErrorGroups(IReportView view, string connString)
+        public async Task<object> GetErrorGroups(IReportView view, string connString)
         {
             using (var db = new alis_uatEntities(connString))
             {
-                db.Database.CommandTimeout = 4 * 60;
-                var q = (from gBatchAudit in db.g_batch_audit
+                var q = await (from gBatchAudit in db.g_batch_audit
                     where gBatchAudit.entry_time >= view.FromDate.Value.Date &&
                           gBatchAudit.entry_time < view.ToDate.Value.Date &&
                           (gBatchAudit.entry_type == 5 || gBatchAudit.entry_type == 6)
@@ -73,14 +73,14 @@ namespace Reporter.Data.Repositories
                         BatchAudit = gBatchAudit,
                         Task = tTask.task_name,
                         Batch = tBatch.batch_name
-                    }).ToList();
+                    }).ToListAsync();
 
                 q.ForEach(rec =>
                     rec.BatchAudit.description = Regex.Replace(rec.BatchAudit.description, @"[\d-]", string.Empty));
 
                 var newQ =
                     from rec in q
-                    group rec by new { rec.BatchAudit.description, rec.Batch, rec.Task, rec.BatchAudit.batch_run_num }
+                    group rec by new {rec.BatchAudit.description, rec.Batch, rec.Task, rec.BatchAudit.batch_run_num}
                     into groupedQuery
                     select new
                     {
@@ -94,23 +94,22 @@ namespace Reporter.Data.Repositories
                         Date = groupedQuery.Min(d => d.BatchAudit.entry_time),
                         groupedQuery.Key.Batch,
                         groupedQuery.Key.Task,
-                        BatchRunNumber = groupedQuery.Key.batch_run_num,                        
+                        BatchRunNumber = groupedQuery.Key.batch_run_num,
                         Count = groupedQuery.Count()
                     };
 
-                var sortedList = newQ.ToSbl();
-                return sortedList;
+                return newQ.ToSbl();
             }
         }
 
-        public DataTable BatchStatistics(IReportView view, string connString)
+        public async Task<object> GetBatchStatistics(IReportView view, string connString)
         {
             using (var db = new alis_uatEntities(connString))
             {
-                db.Database.CommandTimeout = 4 * 60;
                 var q = from gba in db.g_batch_audit
-                    where gba.entry_time > view.FromDate.Value.Date && gba.entry_time < view.ToDate.Value.Date
-                          && gba.entry_type == 3 && gba.description.Contains("completed , reached")
+                    where gba.entry_time > view.FromDate.Value.Date && 
+                    gba.entry_time < view.ToDate.Value.Date && 
+                    gba.description.Contains("completed , reached")
                     join tTask in db.t_task on gba.task_id equals tTask.task_id
                     join tBatch in db.t_batch on gba.batch_id equals tBatch.batch_id
                     group gba by new {tTask.task_name, tBatch.batch_name, gba.batch_run_num}
@@ -120,12 +119,89 @@ namespace Reporter.Data.Repositories
                         grouped.Key.batch_run_num,
                         grouped.Key.batch_name,
                         grouped.Key.task_name,
-                        TotalTime = DbFunctions.DiffMinutes(grouped.Min(g => g.entry_time), grouped.Max(g => g.entry_time)),
+                        //TotalTime = DbFunctions.DiffMinutes(grouped.Min(g => g.entry_time),
+                            //grouped.Max(g => g.entry_time)),
                         //TotalTime = (grouped.Max(g => g.entry_time) - grouped.Min(g => g.entry_time)).TotalMinutes.ToString("F"),
+                        Chunked = grouped.Sum(g => g.chunk_id) > 1 ? "Yes" : "No",
                         Proccessed = grouped.Count()
                     };
-                var y = q.ToList();
-                return IEnumerableToDataTable.ToDataTable(y);
+                return await q.ToListAsync();
+            }
+        }
+
+        public async Task<object> GetTaskList(IReportView view, string connString)
+        {
+            using (var db = new alis_uatEntities(connString))
+            {
+                var q =
+                    from gba in db.g_batch_audit
+                    join tTask in db.t_task on gba.task_id equals tTask.task_id
+                    join tBatch in db.t_batch on gba.batch_id equals tBatch.batch_id
+                    where gba.entry_time > view.FromDate.Value.Date && gba.entry_time < view.ToDate.Value.Date
+                    group new { gba, tTask, tBatch } by new
+                    {
+                        gba.batch_run_num,
+                        tTask.task_id,
+                        tBatch.batch_id,
+                        tTask.task_name,
+                        tBatch.batch_name
+                    }
+                    into g
+                    orderby g.Min(p => p.gba.entry_time)
+                    select new
+                    {
+                        g.Key.batch_name,
+                        g.Key.task_name,
+                        g.Key.batch_run_num,
+                        StartTime = g.Min(p => p.gba.entry_time)
+                        //g.Key.batch_id,                        
+                        //g.Key.task_id
+
+                    };
+                return await q.ToListAsync();
+            }
+        }
+
+        public async Task<object> GetAllErrors(IReportView view, string connString)
+        {
+            using (var db = new alis_uatEntities(connString))
+            {
+                var q = from gba in db.g_batch_audit
+                    join tt in db.t_task on gba.task_id equals tt.task_id
+                    join tb in db.t_batch on gba.batch_id equals tb.batch_id
+                    where
+                        gba.entry_time > view.FromDate.Value.Date &&
+                        gba.entry_time < view.ToDate.Value.Date &&
+                        (gba.entry_type == 6 || gba.entry_type == 5)
+                    orderby new { gba.description}
+                    select new
+                    {
+                        Message = gba.description,
+                        EntityType = gba.primary_key_type,
+                        EntityId = gba.primary_key,
+                        Batch = tb.batch_name,
+                        BatchId = tb.batch_id,
+                        Task = tt.task_name,
+                        TaskId = tt.task_id,
+                        BatchRunNumber = gba.batch_run_num
+                    };
+                    
+
+                //var q = db.g_batch_audit
+                //    .Where(gba => (gba.entry_type == 6 || gba.entry_type == 5) &&
+                //                  gba.entry_time > view.FromDate.Value.Date &&
+                //                  gba.entry_time < view.ToDate.Value.Date)
+                //    .Select(gba => new
+                //    {
+                //        Message = gba.description,
+                //        EntityType = gba.primary_key_type,
+                //        EntityId = gba.primary_key,
+                //        BatchId = gba.batch_id,
+                //        TaskId = gba.task_id,
+                //        BatchRunNumber = gba.batch_run_num
+                //    })
+                //    .OrderBy(g => g.EntityId).ThenBy(g => g.Message);
+                return await q.ToListAsync();
             }
         }
     }

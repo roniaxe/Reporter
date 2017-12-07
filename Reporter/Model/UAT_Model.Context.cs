@@ -21,6 +21,7 @@ namespace Reporter.Model
         public alis_uatEntities(string connString)
             : base(connString)
         {
+            Database.CommandTimeout = 60 * 10;
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

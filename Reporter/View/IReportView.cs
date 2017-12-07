@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Reporter.View
@@ -12,6 +13,8 @@ namespace Reporter.View
         event Action CreateButtonPressed;
 
         event Action RunButtonPressed;
+
+        event Action CancelButtonPressed;
 
         event Action EnvComboBoxChanged;
 
@@ -36,5 +39,13 @@ namespace Reporter.View
         BindingSource PersonBindingSource { get; set; }
 
         DataGridView DataGridView2 { get; set; }
+
+        DataGridView DataGridView3 { get; set; }
+
+        Button RunButton { get; set; }
+
+        Button CnclButton { get; set; }
+
+        DataGridView AllErrorsGrid { get; set; }
     }
 }
