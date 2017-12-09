@@ -83,6 +83,7 @@
     <Compile Include="Data\Repositories\IPersonRepository.cs" />
     <Compile Include="Data\Services\CommentService.cs" />
     <Compile Include="Data\Services\PersonService.cs" />
+    <Compile Include="Data\Services\PolicyFilterService.cs" />
     <Compile Include="Forms\AddEditPersonForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,6 +102,12 @@
     <Compile Include="Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\PolicyFilterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PolicyFilterForm.Designer.cs">
+      <DependentUpon>PolicyFilterForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ReportForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -113,6 +120,7 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Presentor\AddEditPersonPresentor.cs" />
+    <Compile Include="Presentor\PolicyFilterPresentor.cs" />
     <Compile Include="Utils\DistributionManager.cs" />
     <Compile Include="Utils\IEnumerableToDataTable.cs" />
     <Compile Include="Utils\TableToExcelManager.cs" />
@@ -154,7 +162,9 @@
     <Compile Include="Utils\SortableBindingList.cs" />
     <Compile Include="View\IAddEditPersonView.cs" />
     <Compile Include="View\ICommentView.cs" />
+    <Compile Include="View\IPolicyFilterView.cs" />
     <Compile Include="View\IReportView.cs" />
+    <Compile Include="View\IView.cs" />
     <EmbeddedResource Include="Forms\AddEditPersonForm.resx">
       <DependentUpon>AddEditPersonForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -163,6 +173,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PolicyFilterForm.resx">
+      <DependentUpon>PolicyFilterForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ReportForm.resx">
       <DependentUpon>ReportForm.cs</DependentUpon>

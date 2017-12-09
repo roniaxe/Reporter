@@ -17,6 +17,7 @@ namespace Reporter.Data.Repositories
         Task<object> GetBatchStatistics(IReportView view, string connString);
         Task<object> GetTaskList(IReportView view, string connString);
         Task<object> GetAllErrors(IReportView view, string connString);
+        Task<object> GetAuditByPolicy(IPolicyFilterView view, string connString, string policyNo);
     }
 
     internal class BatchAuditRepository : IBatchAuditRepository
@@ -109,7 +110,7 @@ namespace Reporter.Data.Repositories
                 var q = from gba in db.g_batch_audit
                     where gba.entry_time > view.FromDate.Value.Date && 
                     gba.entry_time < view.ToDate.Value.Date && 
-                    gba.description.Contains("completed , reached")
+                    (gba.description.Contains("completed , reached") || gba.batch_id == 168 && gba.entry_type == 3)
                     join tTask in db.t_task on gba.task_id equals tTask.task_id
                     join tBatch in db.t_batch on gba.batch_id equals tBatch.batch_id
                     group gba by new {tTask.task_name, tBatch.batch_name, gba.batch_run_num}
@@ -185,22 +186,35 @@ namespace Reporter.Data.Repositories
                         TaskId = tt.task_id,
                         BatchRunNumber = gba.batch_run_num
                     };
-                    
+                return await q.ToListAsync();
+            }
+        }
 
-                //var q = db.g_batch_audit
-                //    .Where(gba => (gba.entry_type == 6 || gba.entry_type == 5) &&
-                //                  gba.entry_time > view.FromDate.Value.Date &&
-                //                  gba.entry_time < view.ToDate.Value.Date)
-                //    .Select(gba => new
-                //    {
-                //        Message = gba.description,
-                //        EntityType = gba.primary_key_type,
-                //        EntityId = gba.primary_key,
-                //        BatchId = gba.batch_id,
-                //        TaskId = gba.task_id,
-                //        BatchRunNumber = gba.batch_run_num
-                //    })
-                //    .OrderBy(g => g.EntityId).ThenBy(g => g.Message);
+        public async Task<object> GetAuditByPolicy(IPolicyFilterView view, string connString, string policyNo)
+        {
+            using (var db = new alis_uatEntities(connString))
+            {
+                var q = from gba in db.g_batch_audit
+                    join tt in db.t_task on gba.task_id equals tt.task_id
+                    join tb in db.t_batch on gba.batch_id equals tb.batch_id
+                    where
+                        gba.entry_time > view.FromDate.Value.Date &&
+                        gba.entry_time < view.ToDate.Value.Date &&
+                        (string.IsNullOrEmpty(view.PolicyNo.Text) || gba.primary_key.Equals(view.PolicyNo.Text)) &&
+                        (string.IsNullOrEmpty(view.ExtPolicyNo.Text) || gba.primary_key.Equals(view.ExtPolicyNo.Text)) &&
+                        (string.IsNullOrEmpty(view.ClientNo.Text) || gba.primary_key.Equals(view.ClientNo.Text)) 
+                    select new
+                    {
+                        MessageType = gba.entry_type == 6 || gba.entry_type == 5 ? "Error" : "Process",
+                        Message = gba.description,
+                        EntityType = gba.primary_key_type,
+                        EntityId = gba.primary_key,
+                        Batch = tb.batch_name,
+                        BatchId = tb.batch_id,
+                        Task = tt.task_name,
+                        TaskId = tt.task_id,
+                        BatchRunNumber = gba.batch_run_num
+                    };
                 return await q.ToListAsync();
             }
         }

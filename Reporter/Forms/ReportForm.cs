@@ -14,6 +14,7 @@ namespace Reporter.Forms
         public event Action EnvComboBoxChanged;
         public event Action DbComboBoxChanged;
         public event Action<object, DataGridViewCellEventArgs> DgvCellDoubleClicked;
+        public event Action PolicyFilterPressed;
         public event Action RunButtonPressed;
 
         public ReportForm()
@@ -27,6 +28,12 @@ namespace Reporter.Forms
             btnDelete.Click += DeletePersonBtnClicked;
             CreateButton.Click += CreateReportButtonPressed;
             _btnCncl.Click += CnclPressed;
+            btnPolFilter.Click += InvokePolicyFilter;
+        }
+
+        private void InvokePolicyFilter(object sender, EventArgs e)
+        {
+            PolicyFilterPressed?.Invoke();
         }
 
         private void CnclPressed(object sender, EventArgs e)
@@ -124,6 +131,12 @@ namespace Reporter.Forms
         {
             get => dataGridView5;
             set => dataGridView5 = value;
+        }
+
+        public Button PolicyFilterButton
+        {
+            get => btnPolFilter;
+            set => btnPolFilter = value;
         }
 
         private void InvokeCellDoubleClick(object sender, DataGridViewCellEventArgs e)

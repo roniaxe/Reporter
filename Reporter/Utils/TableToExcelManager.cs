@@ -63,7 +63,8 @@ namespace Reporter.Utils
                     if (saveDialog.ShowDialog() == DialogResult.OK)
                     {
                         workbook.SaveAs(saveDialog.FileName);
-                        MessageBox.Show(@"Export Successful");
+                        MessageBox.Show(@"Export Successful", @"Report Generator", MessageBoxButtons.OK,  MessageBoxIcon.Information
+                            , MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                     }
                     fileName = saveDialog.FileName;
                 });

@@ -50,6 +50,14 @@ namespace Reporter.Presentor
             _view.DeletedPerson += DeletePersonAction;
             _view.CreateButtonPressed += CreateReportButtonAction;
             _view.CancelButtonPressed += CancelButtonAction;
+            _view.PolicyFilterPressed += PolicyFilterAction;
+        }
+
+        private void PolicyFilterAction()
+        {
+            var view = new PolicyFilterForm();
+            new PolicyFilterPresentor(view, _connectionString);
+            view.Show();
         }
 
         private void CancelButtonAction()
@@ -115,6 +123,12 @@ namespace Reporter.Presentor
         private void DbComboBoxChangedAction()
         {
             BuildConnectionString();
+            SetPolicyFilterEnableProperty();
+        }
+
+        private void SetPolicyFilterEnableProperty()
+        { 
+            _view.PolicyFilterButton.Enabled = _view.DbComboBox.SelectedItem != null;
         }
 
         private void EnvComboBoxChangedAction()

@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Reporter.View
 {
-    public interface IAddEditPersonView
+    public interface IAddEditPersonView : IView
     {
         event Action Saved;
 

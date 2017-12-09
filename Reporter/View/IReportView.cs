@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Reporter.View
 {
-    public interface IReportView
+    public interface IReportView : IView
     {
         event Action AddedPerson;
 
@@ -21,6 +20,8 @@ namespace Reporter.View
         event Action DbComboBoxChanged;
 
         event Action<object, DataGridViewCellEventArgs> DgvCellDoubleClicked;
+
+        event Action PolicyFilterPressed;
 
         DataGridView DataGridView { get; set; }
 
@@ -47,5 +48,7 @@ namespace Reporter.View
         Button CnclButton { get; set; }
 
         DataGridView AllErrorsGrid { get; set; }
+
+        Button PolicyFilterButton { get; set; }
     }
 }
