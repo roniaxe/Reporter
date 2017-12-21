@@ -17,11 +17,20 @@ namespace Reporter.Utils
             string fileName = null;
             try
             {
-                foreach (DataGridView table in tables)
+                foreach (var table in tables)
                 {
                     _Worksheet worksheet = workbook.Sheets.Add();
                     worksheet.Name = table.Tag as string;
-                    var cellRowIndex = 1;
+
+                    // Creating Sheet Headers
+                    var headerCounter = 1;
+                    foreach (DataGridViewColumn column in table.Columns)
+                    {
+                        worksheet.Cells[1, headerCounter] = column.HeaderText;
+                        headerCounter++;
+                    }
+
+                    var cellRowIndex = 2;
                     var cellColumnIndex = 1;
 
                     //Loop through each row and read value from each column. 
@@ -29,17 +38,14 @@ namespace Reporter.Utils
                     {
                         for (var j = 0; j < table.Columns.Count; j++)
                         {
-                            // Excel index starts from 1,1. As first Row would have the Column headers, adding a condition check. 
-                            if (cellRowIndex == 1)
-                                worksheet.Cells[cellRowIndex, cellColumnIndex] = table.Columns[j].HeaderText;
-                            else
-                                worksheet.Cells[cellRowIndex, cellColumnIndex] =
-                                    table.Rows[i].Cells[j].Value?.ToString();
+                            worksheet.Cells[cellRowIndex, cellColumnIndex] = table.Rows[i].Cells[j].Value?.ToString();
                             cellColumnIndex++;
                         }
+
                         cellColumnIndex = 1;
                         cellRowIndex++;
                     }
+
                     worksheet.Columns.AutoFit();
                     worksheet.Range["A1:Z100"].WrapText = false;
                     worksheet.Cells[1, 1].EntireRow.Font.Bold = true;
@@ -63,16 +69,17 @@ namespace Reporter.Utils
                     if (saveDialog.ShowDialog() == DialogResult.OK)
                     {
                         workbook.SaveAs(saveDialog.FileName);
-                        MessageBox.Show(@"Export Successful", @"Report Generator", MessageBoxButtons.OK,  MessageBoxIcon.Information
+                        MessageBox.Show(@"Export Successful", @"Report Generator", MessageBoxButtons.OK,
+                            MessageBoxIcon.Information
                             , MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                     }
+
                     fileName = saveDialog.FileName;
                 });
                 t.SetApartmentState(ApartmentState.STA);
                 t.Start();
                 t.Join();
                 Console.WriteLine(fileName);
-
             }
             catch (Exception ex)
             {
@@ -82,6 +89,7 @@ namespace Reporter.Utils
             {
                 excel.Quit();
             }
+
             return fileName;
         }
     }

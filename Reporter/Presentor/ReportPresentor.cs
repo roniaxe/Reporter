@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data.Entity.SqlServer.Utilities;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +11,7 @@ using Reporter.Data.Services;
 using Reporter.Forms;
 using Reporter.Utils;
 using Reporter.ViewModel;
+using Reporter.ViewModel.ServiceModel;
 
 namespace Reporter.Presentor
 {
@@ -19,7 +19,18 @@ namespace Reporter.Presentor
     {
         private CancellationTokenSource _cancellationTokenSource;
         private readonly IReportView _view;
-        private string _connectionString;
+        private BaseServiceModel ServiceModel
+        {
+            get
+            {
+                var serviceModel = new BaseServiceModel
+                {
+                    FromDate = _view.FromDate.Value.Date,
+                    ToDate = _view.ToDate.Value.Date
+                };
+                return serviceModel;
+            }
+        }
 
 
         public ReportPresentor(IReportView view)
@@ -56,7 +67,7 @@ namespace Reporter.Presentor
         private void PolicyFilterAction()
         {
             var view = new PolicyFilterForm();
-            new PolicyFilterPresentor(view, _connectionString);
+            new PolicyFilterPresentor(view);
             view.Show();
         }
 
@@ -71,7 +82,7 @@ namespace Reporter.Presentor
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 _view.ProgressBar.Visible = true;
-                _view.AllErrorsGrid.DataSource = await BatchAuditService.AllErrors(_view, _connectionString);
+                _view.AllErrorsGrid.DataSource = await BatchAuditService.AllErrors(ServiceModel);
                 var grids = new List<DataGridView> {_view.DataGridView, _view.DataGridView2, _view.DataGridView3, _view.AllErrorsGrid };
                 var env = _view.EnvComboBox.Text;
                 var db = _view.DbComboBox.Text;
@@ -153,22 +164,23 @@ namespace Reporter.Presentor
             var catalogEndPos = connection.IndexOf(';', catalogStartPos);
             var oldCatalogName = connection.Substring(catalogStartPos, catalogEndPos - catalogStartPos);
             connection = connection.Replace(oldCatalogName, SelectedDb);
-            _connectionString = connection;
+            Global.ConnectionString = connection;
+            //_connectionString = connection;
         }
 
         private async void RunButtonClickActionAsync()
         {
             ClearGrids();
-            _cancellationTokenSource = new CancellationTokenSource();           
+            _cancellationTokenSource = new CancellationTokenSource();
             try
             {
                 _view.ProgressBar.Visible = true;
                 _view.RunButton.Visible = false;
                 _view.CnclButton.Visible = true;
 
-                var errorGroupsTask = BatchAuditService.GetErrorGroups(_view, _connectionString);
-                var batchStatTask = BatchAuditService.BatchStatistics(_view, _connectionString);
-                var taskListTask = BatchAuditService.TaskList(_view, _connectionString);
+                var errorGroupsTask = BatchAuditService.GetErrorGroups(ServiceModel);
+                var batchStatTask = BatchAuditService.BatchStatistics(ServiceModel);
+                var taskListTask = BatchAuditService.TaskList(ServiceModel);
                 var cancelTask = _cancellationTokenSource.Token.AsTask();
                 var tasks = new List<Task<object>> {errorGroupsTask, batchStatTask, taskListTask, cancelTask};
                 while (tasks.Count > 1)

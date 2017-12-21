@@ -7,6 +7,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using Reporter.Utils;
+
 namespace Reporter.Model
 {
     using System.Data.Entity;
@@ -15,8 +17,9 @@ namespace Reporter.Model
     public partial class alis_uatEntities : DbContext
     {
         public alis_uatEntities()
-            : base("name=alis_uatEntities")
+            : base(Global.ConnectionString)
         {
+            Database.CommandTimeout = 60 * 10;
         }
         public alis_uatEntities(string connString)
             : base(connString)

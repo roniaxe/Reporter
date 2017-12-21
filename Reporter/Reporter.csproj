@@ -71,7 +71,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -122,8 +121,11 @@
     <Compile Include="Presentor\AddEditPersonPresentor.cs" />
     <Compile Include="Presentor\PolicyFilterPresentor.cs" />
     <Compile Include="Utils\DistributionManager.cs" />
+    <Compile Include="Utils\Global.cs" />
     <Compile Include="Utils\IEnumerableToDataTable.cs" />
     <Compile Include="Utils\TableToExcelManager.cs" />
+    <Compile Include="ViewModel\ServiceModel\AuditByPolicyServiceModel.cs" />
+    <Compile Include="ViewModel\ServiceModel\BaseServiceModel.cs" />
     <Compile Include="ViewModel\ErrorCommentConn.cs" />
     <Compile Include="Model\g_batch_audit.cs">
       <DependentUpon>UAT_Model.tt</DependentUpon>

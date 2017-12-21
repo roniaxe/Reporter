@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Reporter.Data.Repositories;
-using Reporter.Model;
-using Reporter.View;
+using Reporter.ViewModel.ServiceModel;
 
 namespace Reporter.Data.Services
 {
@@ -16,24 +13,24 @@ namespace Reporter.Data.Services
             BatchAuditRepository = new BatchAuditRepository();
         }
 
-        public static Task<object> GetErrorGroups(IReportView view, string connString)
+        public static Task<object> GetErrorGroups(BaseServiceModel serviceModel)
         {
-            return BatchAuditRepository.GetErrorGroups(view, connString);
+            return BatchAuditRepository.GetErrorGroups(serviceModel);
         }
 
-        public static Task<object> BatchStatistics(IReportView view, string connString)
+        public static Task<object> BatchStatistics(BaseServiceModel serviceModel)
         {
-            return BatchAuditRepository.GetBatchStatistics(view, connString);
+            return BatchAuditRepository.GetBatchStatistics(serviceModel);
         }
 
-        public static Task<object> TaskList(IReportView view, string connString)
+        public static Task<object> TaskList(BaseServiceModel serviceModel)
         {
-            return BatchAuditRepository.GetTaskList(view, connString);
+            return BatchAuditRepository.GetTaskList(serviceModel);
         }
 
-        public static Task<object> AllErrors(IReportView view, string connString)
+        public static Task<object> AllErrors(BaseServiceModel serviceModel)
         {
-            return BatchAuditRepository.GetAllErrors(view, connString);
+            return BatchAuditRepository.GetAllErrors(serviceModel);
         }
     }
 }

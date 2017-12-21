@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Reporter.Data.Repositories;
 using Reporter.View;
+using Reporter.ViewModel.ServiceModel;
 
 namespace Reporter.Data.Services
 {
@@ -12,9 +14,9 @@ namespace Reporter.Data.Services
             BatchAuditRepository = new BatchAuditRepository();
         }
 
-        public static Task<object> AuditForPolicy(IPolicyFilterView view, string connString, string policyNo)
+        public static Task<object> AuditForPolicy(AuditByPolicyServiceModel serviceModel)
         {
-            return BatchAuditRepository.GetAuditByPolicy(view, connString, policyNo);
+            return BatchAuditRepository.GetAuditByPolicy(serviceModel);
         }
     }
 }

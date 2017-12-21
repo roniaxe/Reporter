@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using Reporter.Data.Services;
+﻿using Reporter.Data.Services;
 using Reporter.Forms;
 using Reporter.Model;
 using Reporter.View;

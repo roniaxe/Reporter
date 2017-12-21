@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 using Reporter.Data.Services;
 using Reporter.Model;
 using Reporter.Utils;
-using Reporter.View;
 using Reporter.ViewModel;
+using Reporter.ViewModel.ServiceModel;
 
 namespace Reporter.Data.Repositories
 {
     internal interface IBatchAuditRepository : IGenericRepository<g_batch_audit>
     {
-        Task<object> GetErrorGroups(IReportView view, string connString);
-        Task<object> GetBatchStatistics(IReportView view, string connString);
-        Task<object> GetTaskList(IReportView view, string connString);
-        Task<object> GetAllErrors(IReportView view, string connString);
-        Task<object> GetAuditByPolicy(IPolicyFilterView view, string connString, string policyNo);
+        Task<object> GetErrorGroups(BaseServiceModel serviceModel);
+        Task<object> GetBatchStatistics(BaseServiceModel serviceModel);
+        Task<object> GetTaskList(BaseServiceModel serviceModel);
+        Task<object> GetAllErrors(BaseServiceModel serviceModel);
+        Task<object> GetAuditByPolicy(AuditByPolicyServiceModel serviceModel);
     }
 
     internal class BatchAuditRepository : IBatchAuditRepository
@@ -58,13 +58,13 @@ namespace Reporter.Data.Repositories
             }
         }
 
-        public async Task<object> GetErrorGroups(IReportView view, string connString)
+        public async Task<object> GetErrorGroups(BaseServiceModel serviceModel)
         {
-            using (var db = new alis_uatEntities(connString))
+            using (var db = new alis_uatEntities())
             {
                 var q = await (from gBatchAudit in db.g_batch_audit
-                    where gBatchAudit.entry_time >= view.FromDate.Value.Date &&
-                          gBatchAudit.entry_time < view.ToDate.Value.Date &&
+                    where gBatchAudit.entry_time >= serviceModel.FromDate &&
+                          gBatchAudit.entry_time < serviceModel.ToDate &&
                           (gBatchAudit.entry_type == 5 || gBatchAudit.entry_type == 6)
                     join tTask in db.t_task on gBatchAudit.task_id equals tTask.task_id into firstJoin
                     from tTask in firstJoin.DefaultIfEmpty()
@@ -103,13 +103,13 @@ namespace Reporter.Data.Repositories
             }
         }
 
-        public async Task<object> GetBatchStatistics(IReportView view, string connString)
+        public async Task<object> GetBatchStatistics(BaseServiceModel serviceModel)
         {
-            using (var db = new alis_uatEntities(connString))
+            using (var db = new alis_uatEntities())
             {
                 var q = from gba in db.g_batch_audit
-                    where gba.entry_time > view.FromDate.Value.Date && 
-                    gba.entry_time < view.ToDate.Value.Date && 
+                    where gba.entry_time > serviceModel.FromDate && 
+                    gba.entry_time < serviceModel.ToDate && 
                     (gba.description.Contains("completed , reached") || gba.batch_id == 168 && gba.entry_type == 3)
                     join tTask in db.t_task on gba.task_id equals tTask.task_id
                     join tBatch in db.t_batch on gba.batch_id equals tBatch.batch_id
@@ -121,8 +121,6 @@ namespace Reporter.Data.Repositories
                         grouped.Key.batch_name,
                         grouped.Key.task_name,
                         //TotalTime = DbFunctions.DiffMinutes(grouped.Min(g => g.entry_time),
-                            //grouped.Max(g => g.entry_time)),
-                        //TotalTime = (grouped.Max(g => g.entry_time) - grouped.Min(g => g.entry_time)).TotalMinutes.ToString("F"),
                         Chunked = grouped.Sum(g => g.chunk_id) > 1 ? "Yes" : "No",
                         Proccessed = grouped.Count()
                     };
@@ -130,15 +128,15 @@ namespace Reporter.Data.Repositories
             }
         }
 
-        public async Task<object> GetTaskList(IReportView view, string connString)
+        public async Task<object> GetTaskList(BaseServiceModel serviceModel)
         {
-            using (var db = new alis_uatEntities(connString))
+            using (var db = new alis_uatEntities())
             {
                 var q =
                     from gba in db.g_batch_audit
                     join tTask in db.t_task on gba.task_id equals tTask.task_id
                     join tBatch in db.t_batch on gba.batch_id equals tBatch.batch_id
-                    where gba.entry_time > view.FromDate.Value.Date && gba.entry_time < view.ToDate.Value.Date
+                    where gba.entry_time > serviceModel.FromDate && gba.entry_time < serviceModel.ToDate
                     group new { gba, tTask, tBatch } by new
                     {
                         gba.batch_run_num,
@@ -163,16 +161,16 @@ namespace Reporter.Data.Repositories
             }
         }
 
-        public async Task<object> GetAllErrors(IReportView view, string connString)
+        public async Task<object> GetAllErrors(BaseServiceModel serviceModel)
         {
-            using (var db = new alis_uatEntities(connString))
+            using (var db = new alis_uatEntities())
             {
                 var q = from gba in db.g_batch_audit
                     join tt in db.t_task on gba.task_id equals tt.task_id
                     join tb in db.t_batch on gba.batch_id equals tb.batch_id
                     where
-                        gba.entry_time > view.FromDate.Value.Date &&
-                        gba.entry_time < view.ToDate.Value.Date &&
+                        gba.entry_time > serviceModel.FromDate &&
+                        gba.entry_time < serviceModel.ToDate &&
                         (gba.entry_type == 6 || gba.entry_type == 5)
                     orderby new { gba.description}
                     select new
@@ -190,19 +188,19 @@ namespace Reporter.Data.Repositories
             }
         }
 
-        public async Task<object> GetAuditByPolicy(IPolicyFilterView view, string connString, string policyNo)
+        public async Task<object> GetAuditByPolicy(AuditByPolicyServiceModel serviceModel)
         {
-            using (var db = new alis_uatEntities(connString))
+            using (var db = new alis_uatEntities())
             {
                 var q = from gba in db.g_batch_audit
                     join tt in db.t_task on gba.task_id equals tt.task_id
                     join tb in db.t_batch on gba.batch_id equals tb.batch_id
                     where
-                        gba.entry_time > view.FromDate.Value.Date &&
-                        gba.entry_time < view.ToDate.Value.Date &&
-                        (string.IsNullOrEmpty(view.PolicyNo.Text) || gba.primary_key.Equals(view.PolicyNo.Text)) &&
-                        (string.IsNullOrEmpty(view.ExtPolicyNo.Text) || gba.primary_key.Equals(view.ExtPolicyNo.Text)) &&
-                        (string.IsNullOrEmpty(view.ClientNo.Text) || gba.primary_key.Equals(view.ClientNo.Text)) 
+                        gba.entry_time > serviceModel.FromDate &&
+                        gba.entry_time < serviceModel.ToDate &&
+                        (string.IsNullOrEmpty(serviceModel.PolicyNo) || gba.primary_key.Equals(serviceModel.PolicyNo)) &&
+                        (string.IsNullOrEmpty(serviceModel.ExternalPolicyNo) || gba.primary_key.Equals(serviceModel.ExternalPolicyNo)) &&
+                        (string.IsNullOrEmpty(serviceModel.ClientNo) || gba.primary_key.Equals(serviceModel.ClientNo)) 
                     select new
                     {
                         MessageType = gba.entry_type == 6 || gba.entry_type == 5 ? "Error" : "Process",
