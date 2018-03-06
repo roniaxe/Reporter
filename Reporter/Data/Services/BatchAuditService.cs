@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Reporter.Data.Repositories;
 using Reporter.ViewModel.ServiceModel;
 
@@ -13,22 +14,22 @@ namespace Reporter.Data.Services
             BatchAuditRepository = new BatchAuditRepository();
         }
 
-        public static Task<object> GetErrorGroups(BaseServiceModel serviceModel)
+        public static Task<object> GetErrorGroups((DateTime FromDate, DateTime ToDate) serviceModel)
         {
             return BatchAuditRepository.GetErrorGroups(serviceModel);
         }
 
-        public static Task<object> BatchStatistics(BaseServiceModel serviceModel)
+        public static Task<object> BatchStatistics((DateTime FromDate, DateTime ToDate) serviceModel)
         {
             return BatchAuditRepository.GetBatchStatistics(serviceModel);
         }
 
-        public static Task<object> TaskList(BaseServiceModel serviceModel)
+        public static Task<object> TaskList((DateTime FromDate, DateTime ToDate) serviceModel)
         {
             return BatchAuditRepository.GetTaskList(serviceModel);
         }
 
-        public static Task<object> AllErrors(BaseServiceModel serviceModel)
+        public static Task<object> AllErrors((DateTime FromDate, DateTime ToDate) serviceModel)
         {
             return BatchAuditRepository.GetAllErrors(serviceModel);
         }

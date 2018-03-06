@@ -13,7 +13,7 @@ namespace Reporter.Utils
         {
             var to = PersonService.GetAll().Select(person => person.EmailAddress).ToList();
             var body = $@"Hello, 
-Attached the daily batches error report for:
+Attached the daily batches summary report for:
 Date: {DateTime.Today:D}
 Environment: {env}
 DB: {db}";

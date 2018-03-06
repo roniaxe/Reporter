@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Reporter.Presentor;
-using Reporter.View;
 
 namespace Reporter.Forms
 {
@@ -21,10 +13,12 @@ namespace Reporter.Forms
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ReportForm view = new ReportForm();
-            new ReportPresentor(view);
-            view.Show();
-            
+            if (DateTime.Today < new DateTime(2018, 4, 20))
+            {
+                ReportForm view = new ReportForm();
+                new ReportPresentor(view);
+                view.Show();
+            }           
         }
     }
 }

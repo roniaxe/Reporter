@@ -19,19 +19,7 @@ namespace Reporter.Presentor
     {
         private CancellationTokenSource _cancellationTokenSource;
         private readonly IReportView _view;
-        private BaseServiceModel ServiceModel
-        {
-            get
-            {
-                var serviceModel = new BaseServiceModel
-                {
-                    FromDate = _view.FromDate.Value.Date,
-                    ToDate = _view.ToDate.Value.Date
-                };
-                return serviceModel;
-            }
-        }
-
+        private (DateTime FromDate, DateTime ToDate) ServiceModel => (_view.FromDate.Value.Date, _view.ToDate.Value.Date);
 
         public ReportPresentor(IReportView view)
         {

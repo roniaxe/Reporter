@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -13,10 +15,10 @@ namespace Reporter.Data.Repositories
 {
     internal interface IBatchAuditRepository : IGenericRepository<g_batch_audit>
     {
-        Task<object> GetErrorGroups(BaseServiceModel serviceModel);
-        Task<object> GetBatchStatistics(BaseServiceModel serviceModel);
-        Task<object> GetTaskList(BaseServiceModel serviceModel);
-        Task<object> GetAllErrors(BaseServiceModel serviceModel);
+        Task<object> GetErrorGroups((DateTime FromDate, DateTime ToDate) serviceModel);
+        Task<object> GetBatchStatistics((DateTime FromDate, DateTime ToDate) serviceModel);
+        Task<object> GetTaskList((DateTime FromDate, DateTime ToDate) serviceModel);
+        Task<object> GetAllErrors((DateTime FromDate, DateTime ToDate) serviceModel);
         Task<object> GetAuditByPolicy(AuditByPolicyServiceModel serviceModel);
     }
 
@@ -58,11 +60,12 @@ namespace Reporter.Data.Repositories
             }
         }
 
-        public async Task<object> GetErrorGroups(BaseServiceModel serviceModel)
+        public async Task<object> GetErrorGroups((DateTime FromDate, DateTime ToDate) serviceModel)
         {
             using (var db = new alis_uatEntities())
             {
-                var q = await (from gBatchAudit in db.g_batch_audit
+                var q = await (
+                    from gBatchAudit in db.g_batch_audit
                     where gBatchAudit.entry_time >= serviceModel.FromDate &&
                           gBatchAudit.entry_time < serviceModel.ToDate &&
                           (gBatchAudit.entry_type == 5 || gBatchAudit.entry_type == 6)
@@ -75,7 +78,7 @@ namespace Reporter.Data.Repositories
                         Task = tTask.task_name,
                         Batch = tBatch.batch_name
                     }).ToListAsync();
-
+                
                 q.ForEach(rec =>
                     rec.BatchAudit.description = Regex.Replace(rec.BatchAudit.description, @"[\d-]", string.Empty));
 
@@ -99,11 +102,13 @@ namespace Reporter.Data.Repositories
                         Count = groupedQuery.Count()
                     };
 
-                return newQ.ToSbl();
+                return newQ
+                    .OrderBy(grp => grp.BatchRunNumber)
+                    .ThenBy(grp => grp.Count).ToSbl();
             }
         }
 
-        public async Task<object> GetBatchStatistics(BaseServiceModel serviceModel)
+        public async Task<object> GetBatchStatistics((DateTime FromDate, DateTime ToDate) serviceModel)
         {
             using (var db = new alis_uatEntities())
             {
@@ -124,11 +129,11 @@ namespace Reporter.Data.Repositories
                         Chunked = grouped.Sum(g => g.chunk_id) > 1 ? "Yes" : "No",
                         Proccessed = grouped.Count()
                     };
-                return await q.ToListAsync();
+                return await q.OrderBy(stat => stat.batch_run_num).ToListAsync();
             }
         }
 
-        public async Task<object> GetTaskList(BaseServiceModel serviceModel)
+        public async Task<object> GetTaskList((DateTime FromDate, DateTime ToDate) serviceModel)
         {
             using (var db = new alis_uatEntities())
             {
@@ -150,7 +155,9 @@ namespace Reporter.Data.Repositories
                     select new
                     {
                         g.Key.batch_name,
+                        g.Key.batch_id,
                         g.Key.task_name,
+                        g.Key.task_id,
                         g.Key.batch_run_num,
                         StartTime = g.Min(p => p.gba.entry_time)
                         //g.Key.batch_id,                        
@@ -161,7 +168,7 @@ namespace Reporter.Data.Repositories
             }
         }
 
-        public async Task<object> GetAllErrors(BaseServiceModel serviceModel)
+        public async Task<object> GetAllErrors((DateTime FromDate, DateTime ToDate) serviceModel)
         {
             using (var db = new alis_uatEntities())
             {
@@ -184,7 +191,10 @@ namespace Reporter.Data.Repositories
                         TaskId = tt.task_id,
                         BatchRunNumber = gba.batch_run_num
                     };
-                return await q.ToListAsync();
+                return await q
+                     .OrderBy(errs => errs.BatchRunNumber)
+                    .ThenBy(errs => errs.Message)
+                    .ToListAsync();
             }
         }
 
